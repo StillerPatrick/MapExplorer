@@ -13,9 +13,9 @@ Workflow to solve this task
 
 ## Todo
 
-* adapt the exsisting data generator
+* adapt the existing data generator
 * write a data loader
-* preprocess data (grayscale, opencv denoise) 
+* preprocess data (grayscale, OpenCV denoise) 
 * import unet model
 * train data cleaning model
 * test
