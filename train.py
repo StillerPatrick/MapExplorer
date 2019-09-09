@@ -22,17 +22,6 @@ parser.add_argument("--identifier",action="store", type=int)
 
 args = parser.parse_args()
 
-dataset = Mapdataset(args.basedir,args.numTrainingSamples, args.numValidationSamples, args.numTestSamples, args.gpu)
+trainDataset = Mapdataset(args.basedir, args.gpu)
+trainLoader = torch.utils.data.DataLoader(trainDataset,args.batch_size,args.shuffle,num_workers=2)
 
-
-
-
-
-# create dataset 
-
-
-
-# define trainloop
-
-
-    # iterate over all elements of the dataset 
