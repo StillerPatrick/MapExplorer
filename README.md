@@ -1,8 +1,14 @@
 # MapExplorer
-D3Hack
 
+The goal of this project is to recognize text from old maps. 
 
-## Workflow
+![mapsample](/docs/sample.jpeg)
+
+Workflow to solve this task
+
+1. generate artificial sample data with random texts
+2. train a U-Net that removes the map data, leaving only the text
+3. use tesseract OCR to recognize the text of the cleaned map tile  
 
 
 ## Todo
