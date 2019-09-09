@@ -1,0 +1,9 @@
+Buchstabensets
+
+[1] 25n / 27n:
+  normal
+  Defaultgröße 25
+  Placement:
+    Unten: +25px
+    
+    Danach nach oben bis 80px auffüllen
