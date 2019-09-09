@@ -13,4 +13,4 @@ pip install --user scikit-learn
 module load matplotlib/2.1.2-foss-2018a-Python-3.6.4
 module load OpenCV
 pip install --user progressbar2
-python genSet3.py 200 20000 OutputGenerated
+python genSet3.py 20000 OutputGenerated
