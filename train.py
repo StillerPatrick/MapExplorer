@@ -54,6 +54,18 @@ optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
 
 ssim = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
 
+val_x , val_y = validationLoader.dataset[0]
+writer.add_image("input_image0",val_x,0)
+writer.add_image("label_image0",val_y,0)
+
+val_x , val_y = validationLoader.dataset[20]
+writer.add_image("input_image20",val_x,0)
+writer.add_image("label_image20",val_y,0)
+
+val_x , val_y = validationLoader.dataset[100]
+writer.add_image("input_image100",val_x,0)
+writer.add_image("label_image100",val_y,0)
+
 def validationStep(model,loader,epoch):
     validationLoss = []
     for validation_x, validation_y in loader:
@@ -72,6 +84,12 @@ def validationStep(model,loader,epoch):
     writer.add_image("validation_image100",val_pred[0],epoch)
     return np.mean(validationLoss)
 
+def save_checkpoint(model, optimizer, path, epoch):
+   state = {
+       'model': model.state_dict(),
+       'optimizer': optimizer.state_dict(),
+   }
+   torch.save(state, path + '_' + str(epoch))
 
 # training loop 
 for epoch in range(args.epochs):
@@ -90,6 +108,9 @@ for epoch in range(args.epochs):
         eLoss = np.mean(epoch_loss)
         writer.add_scalar('training_loss',loss,epoch)
         val_loss = validationStep(model,validationLoader,epoch)
+        model_path = "checkpoints/"+args.identifier+"/ckpt"
+        tools.create_path_if_not_exists(model_path)
+        save_checkpoint(model,optimizer,model_path,epoch)
         print("Training Loss", eLoss, "Validation Loss", val_loss)
 
 
