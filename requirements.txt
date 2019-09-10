@@ -1,1 +1,5 @@
 pytorch
+progressbar2
+scikit-learn
+OpenCV
+matplotlib
