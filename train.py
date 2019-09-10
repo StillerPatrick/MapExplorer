@@ -4,6 +4,7 @@ import torch
 import numpy as np 
 from dataset import Mapdataset
 from models.unet import UNet
+from models.tiramisu import FCDenseNet103
 from loss.loss import SSIM
 from tensorboardX import SummaryWriter
 import tools as tools 
@@ -44,7 +45,8 @@ print("Tensorboard enviorment created at:", tensorboard_path)
 
 if args.gpu:
     print("You running your model at gpu")
-    model = UNet(1,1).cuda()
+    #model = UNet(1,1).cuda()
+    model = FCDenseNet103(1).cuda()
 else:
     print("You running your model at cpu")
     model = UNet(1,1)
@@ -60,7 +62,6 @@ def validationStep(model,loader,epoch):
         validationLoss.append(val_loss.item())
     writer.add_scalar("validation_loss",np.mean(validationLoss),epoch)
     val_x , _ = loader.dataset[0]
-    print(val_x.shape)
     val_pred = model(val_x.unsqueeze(0))
     writer.add_image("validation_image0",val_pred[0],epoch)
     val_x , _ = loader.dataset[20]
