@@ -7,6 +7,7 @@ from models.unet import UNet
 from loss.loss import SSIM
 from tensorboardX import SummaryWriter
 import tools as tools 
+from tqdm import tqdm
 
 # define command line parameter 
 parser = argparse.ArgumentParser(description="Define the parameter of the training process")
@@ -30,9 +31,9 @@ trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuff
 writer = SummaryWriter(args.tbpath)
 
 if args.gpu:
-    model = UNet(3,1).cuda()
+    model = UNet(1,1).cuda()
 else:
-    model = UNet(3,1)
+    model = UNet(1,1)
 
 optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
 
@@ -40,14 +41,14 @@ ssim = SSIM(device="cuda:0" if args.gpu else "cpu:0")
 
 # training loop 
 for epoch in range(args.epochs):
-    for train_x, train_y in trainLoader:
+    for train_x, train_y in tqdm(trainLoader, desc='Train epoch %d' % epoch):
             optimizer.zero_grad()
             prediction = model(train_x)
             loss = -ssim(prediction,train_y)
             loss.backward()
             optimizer.step()
     
-    tools.saveimage(prediction, train_y,epoch)
+    tools.saveimage(prediction, train_y,train_x,epoch)
     print("Loss at Epoch",epoch,":",loss.item())
         
 
