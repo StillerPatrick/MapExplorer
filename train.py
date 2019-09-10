@@ -25,7 +25,7 @@ parser.add_argument("--identifier",action="store", type=str)
 args = parser.parse_args()
 
 trainDataset = Mapdataset(args.basedir, args.gpu)
-trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle,num_workers=2)
+trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle,num_workers=0)
 writer = SummaryWriter(args.tbpath)
 
 if args.gpu:

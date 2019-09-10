@@ -18,15 +18,15 @@ class Mapdataset(Dataset):
         self.xs = []
         self.ys = []
 
-        for file in tqdm((os.listdir(x_path)[:2]),desc="Load inputs"): 
+        for file in tqdm((os.listdir(x_path)[:2000]),desc="Load inputs"): 
             image = cv2.imread(os.path.join(x_path,file))
-            image = cv2.resize(image,(800,150))
+            image = cv2.resize(image,(400,75))
             image = np.rollaxis(image,2,0)
             self.xs.append(image)
 
-        for file in tqdm((os.listdir(y_path)[:2]),desc="Load Labels"): 
+        for file in tqdm((os.listdir(y_path)[:2000]),desc="Load Labels"): 
             image = cv2.imread(os.path.join(y_path,file))
-            image = cv2.resize(image,(800,150))
+            image = cv2.resize(image,(400,75))
             image = np.rollaxis(image,2,0)
             self.ys.append(image)
 
