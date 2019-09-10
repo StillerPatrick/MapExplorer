@@ -25,19 +25,15 @@ class Mapdataset(Dataset):
             self.xs.append(image)
 
         for file in tqdm((os.listdir(y_path)[:2]),desc="Load Labels"): 
-            image = cv2.imread(os.path.join(y_path,file))
+            image = cv2.imread(os.path.join(y_path,file),0)
             image = cv2.resize(image,(800,150))
-            image = np.rollaxis(image,2,0)
+            image = np.expand_dims(image,0)
             self.ys.append(image)
 
         if gpu:
             self.dtype = torch.cuda.FloatTensor
         else:
             self.dtype = torch.FloatTensor
-
-        print(len(self.xs))
-        print(len(self.ys))
-
 
     def __getitem__(self, index):
         return self.dtype(self.xs[index]), self.dtype(self.ys[index])
