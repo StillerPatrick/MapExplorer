@@ -16,7 +16,6 @@ import numpy as np
 
 import math
 import matplotlib.pyplot as plt
-import cv2
 
 try:
     import progressbar
