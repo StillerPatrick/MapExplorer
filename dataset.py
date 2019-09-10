@@ -31,7 +31,7 @@ class Mapdataset(Dataset):
             image = cv2.imread(os.path.join(y_path,file),0)
             image = cv2.resize(image,(400,75))
             _,image = cv2.threshold(image,180,255,cv2.THRESH_BINARY)
-
+            image = image / 255
             image = np.expand_dims(image,0)
             self.ys.append(image)
 

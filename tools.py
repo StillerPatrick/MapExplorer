@@ -7,3 +7,7 @@ def saveimage(prediction,target,input, epoch):
     torchvision.utils.save_image(prediction,f'runs/current/{epoch}-prediction.png',normalize=True)
     torchvision.utils.save_image(target,f'runs/current/{epoch}-target.png',normalize=True)
     torchvision.utils.save_image(input,f'runs/current/{epoch}-input.png',normalize=True)
+
+def create_path_if_not_exists(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
