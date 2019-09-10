@@ -14,7 +14,7 @@ from sys import argv, stdout
 import string
 import numpy as np
 
-from sklearn.cluster import KMeans
+import math
 import matplotlib.pyplot as plt
 import cv2
 
@@ -455,15 +455,6 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
     print("\nDone.")
 
 
-def randomFontColor():
-    # random grey color in specific range
-    R = random.randint(78, 85)
-    G = random.randint(70, 78)
-    B = random.randint(67, 75)
-    # (83, 74, 69) <-- gute Farbe
-    return (R, G, B, 255)
-
-
 def fontTest():
     loadBackgroundImages()
     fontSize = 128
@@ -505,32 +496,7 @@ def plot_colors2(hist, centroids):
 
 
 def getFontColor(back):
-        # from https://code.likeagirl.io/finding-dominant-colour-on-an-image-b4e075f98097
-        # and https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
-
-        colorfindimg = np.array(back.convert('RGB'))
-        colorfindimg = colorfindimg[:, :, ::-1].copy() 
-        colorfindimg = cv2.cvtColor(colorfindimg, cv2.COLOR_BGR2RGB)
-
-        colorfindimg = colorfindimg.reshape((colorfindimg.shape[0] * colorfindimg.shape[1],3)) #represent as row*column,channel number
-        clt = KMeans(n_clusters=KMeans_nClusters) #cluster number
-        clt.fit(colorfindimg)
-
-        hist = find_histogram(clt)
-
-        R_low = 255
-        G_low = 255
-        B_low = 255
-        centers = clt.cluster_centers_
-        n = 0
-        for (percent, color) in zip(hist, clt.cluster_centers_): 
-            # versuchen, den richtigen Farbton zu picken    
-            if(color[0] < R_low): R_low = color[0]
-            if(color[1] < G_low): G_low = color[1]
-            if(color[2] < B_low): B_low = color[2]    
-
-        color = (int(round(R_low)), int(round(G_low)), int(round(B_low)), 255) 
-        return color
+    return (math.floor(120 * random.uniform(0.9, 1.1)), math.floor(110 * random.uniform(0.9, 1.1)), math.floor(100 * random.uniform(0.9, 1.1)), 255)
 
 if __name__ == '__main__':
     # spacingTest("Dykhausen")
