@@ -44,5 +44,12 @@ class Mapdataset(Dataset):
 
     def __len__(self):
         return len(self.xs)
+
+    @staticmethod
+    def get_image(path):
+        image = cv2.imread(path)
+        image = cv2.resize(image,(800,150))
+        image = np.rollaxis(image,2,0)
+        return torch.Tensor(image)
     
  
