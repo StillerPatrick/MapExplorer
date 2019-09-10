@@ -41,10 +41,6 @@ class Mapdataset(Dataset):
                 image = image /255
                 self.ys.append(image)
             except Exception as e: print(e,image)
-<<<<<<< HEAD
-=======
-
->>>>>>> fe67cf4597dddb685f6336e131a1409eb315d46f
 
         if gpu:
             self.dtype = torch.cuda.FloatTensor
