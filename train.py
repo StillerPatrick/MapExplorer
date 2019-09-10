@@ -5,6 +5,7 @@ import numpy as np
 from dataset import Mapdataset
 from models.unet import UNet
 from loss.loss import SSIM
+from tensorboardX import SummaryWriter
 
 # define command line parameter 
 parser = argparse.ArgumentParser(description="Define the parameter of the training process")
@@ -25,6 +26,7 @@ args = parser.parse_args()
 
 trainDataset = Mapdataset(args.basedir, args.gpu)
 trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle,num_workers=2)
+writer = SummaryWriter(args.tbpath)
 
 if args.gpu:
     model = UNet(3,1).cuda()
