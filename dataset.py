@@ -28,9 +28,10 @@ class Mapdataset(Dataset):
             self.xs.append(image)
 
         for file in tqdm((os.listdir(y_path)[:2000]),desc="Load Labels"): 
-            image = cv2.imread(os.path.join(y_path,file))
+            image = cv2.imread(os.path.join(y_path,file),0)
             image = cv2.resize(image,(400,75))
-            image = np.rollaxis(image,2,0)
+            image = np.expand_dims(image,0)
+            #image = np.rollaxis(image,2,0)
             self.ys.append(image)
 
         if gpu:
@@ -46,7 +47,7 @@ class Mapdataset(Dataset):
         """
         Get a specific item
         """
-        return self.dtype(self.xs[index]), self.dtype(self.ys[index])
+        return torch.Tensor(self.xs[index]).float().cuda(), torch.Tensor(self.ys[index]).float().cuda()
 
     def __len__(self):
         """

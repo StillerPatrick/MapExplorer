@@ -33,16 +33,16 @@ if args.gpu:
 else:
     model = UNet(3,1)
 
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-2)
 
-ssim = SSIM()
-mse = torch.nn.MSELoss()
+ssim = SSIM(device="cuda:0" if args.gpu else "cpu:0")
+
 # training loop 
 for epoch in range(args.epochs):
     for train_x, train_y in trainLoader:
             optimizer.zero_grad()
             prediction = model(train_x)
-            loss = mse(prediction,train_y)
+            loss = -ssim(prediction,train_y)
             loss.backward()
             optimizer.step()
             if epoch % 2:
