@@ -298,6 +298,7 @@ def randomWord(dictionary):
     word = word.split("-")[0]
     word = word.split(" ")[0]
     word = word.split("(")[0]
+    word = word.split("/")[0]
 
     return word
 
