@@ -445,6 +445,17 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
 
                 saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathNoBackground, printOutput=False)
 
+                for i in range(1,font_img.width-1):
+                    for j in range(1,font_img.height-1):
+                        (r, g, b, a) = font_img.getpixel((i,j))
+
+                        if(a > 0):
+                            r += (random.randint(-10, 30));
+                            g += (random.randint(-10, 30));
+                            b += (random.randint(-10, 30));
+
+                        font_img.putpixel((i,j), (r, g, b, a))
+
                 # Add background and save it again
                 img.paste(backgroundArea, (0, 0)) # Paste background
                 img.paste(font_img, (0, 0), font_img)
