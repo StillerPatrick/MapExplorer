@@ -1,3 +1,3 @@
 #!/bin/bash
 
-python3 train.py --epochs 50 --batchsize 32 --basedir dataset/train/ --tbpath runs --gpu 1 --shuffle 1 --identifier test
+python3 train.py --epochs 10 --batchsize 32 --basedirtrain dataset/train/ --basedirvalidation dataset/Validation5k/ --basedirtest dataset/Test10k/ --tbpath runs --gpu 1 --shuffle 1 --identifier firstrun_mse
