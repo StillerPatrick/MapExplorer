@@ -285,27 +285,21 @@ def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     return rndString
 
 
-def randomWord(wordList, minLength, maxLength, uppercaseBehaviour='random'):
+def load_all_words_from_file(input_file):
+    with open(input_file, "r") as f:
+        lines = f.readlines()
+    
+    return lines
 
-    # TODO: für Variante 'Buchstabensalat' komplett kompatibel machen -> Check, ob alle Buchstaben vorhanden!
-
-    upperCBehaviour = ['random', 'onlyfirstMAX', 'onlyfirstMIN', 'all']
-    if uppercaseBehaviour not in upperCBehaviour:
-        raise ValueError("Invalid uppercaseBehaviour. Expected one of: %s" % upperCBehaviour)
-
-    word = random.sample(wordList, 1)[0]
-
-    if(upperCBehaviour == 'onlyfirstMIN'):
-        word[0] = word[0].upper()
-    elif(upperCBehaviour == 'onlyfirstMAX'):
-        if(random.random() > 0.5):
-            word[0] = word[0].upper()
-    elif upperCBehaviour == 'all':
-        for i in range(len(word)):
-            word[i] = word[i].upper
+def randomWord(dictionary):
+    word = random.choice(dictionary)
+    
+    word = word.split("\n")[0]
+    word = word.split("-")[0]
+    word = word.split(" ")[0]
+    word = word.split("(")[0]
 
     return word
-
 
 def loadDictFile(file):
 
@@ -415,16 +409,16 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
     maxSize = 80
     minScale = 1.4
     maxScale = 3
+
+    dictionary = load_all_words_from_file("cities.txt")
+
     for back in backgrounds:
         backnr += 1 
 
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            if(wordList is None):
-                label = randomString(string.ascii_letters, 2, 15, uppercaseBehaviour='onlyfirstMIN')
-            else:
-                label = randomWord(wordList, 2, 10, uppercaseBehaviour='onlyfirstMIN')
+            label = randomWord(dictionary)
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
             #print(fonts[i][1])
