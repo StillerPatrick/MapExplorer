@@ -10,6 +10,9 @@ from tqdm import tqdm
 class Mapdataset(Dataset):
 
     def __init__(self, basedir, gpu=True):
+        """
+        Loads the data, resizes the data and provides x and y
+        """
         y_path = os.path.join(basedir,"NoBackground")
         x_path = os.path.join(basedir,"WithBackground")
 
@@ -40,9 +43,15 @@ class Mapdataset(Dataset):
 
 
     def __getitem__(self, index):
+        """
+        Get a specific item
+        """
         return self.dtype(self.xs[index]), self.dtype(self.ys[index])
 
     def __len__(self):
+        """
+        Get length of the training data set
+        """
         return len(self.xs)
     
  
