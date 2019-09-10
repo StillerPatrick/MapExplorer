@@ -3,3 +3,4 @@ progressbar2
 scikit-learn
 OpenCV
 matplotlib
+pytesseract
