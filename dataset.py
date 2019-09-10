@@ -21,19 +21,35 @@ class Mapdataset(Dataset):
         self.xs = []
         self.ys = []
 
-        for file in tqdm((os.listdir(x_path)[:length]),desc="Load inputs"): 
-            image = cv2.imread(os.path.join(x_path,file),0)
-            image = cv2.resize(image,(400,75))
-            image = np.expand_dims(image,0)
-            self.xs.append(image)
-
+        for file in tqdm((os.listdir(x_path)[:length]),desc="Load inputs"):
+            try:
+                image = cv2.imread(os.path.join(x_path,file),0)
+                image = cv2.resize(image,(400,75))
+                image = np.expand_dims(image,0)
+                image = image /255
+                self.xs.append(image)
+            except Exception as e: print(e,image)
+                
+                
         for file in tqdm((os.listdir(y_path)[:length]),desc="Load Labels"): 
+<<<<<<< HEAD
+            try:
+                image = cv2.imread(os.path.join(y_path,file),0)
+                image = cv2.resize(image,(400,75))
+                _,image = cv2.threshold(image,180,255,cv2.THRESH_BINARY)
+                
+                image = np.expand_dims(image,0)
+                image = image /255
+                self.ys.append(image)
+            except Exception as e: print(e,image)
+=======
             image = cv2.imread(os.path.join(y_path,file),0)
             image = cv2.resize(image,(400,75))
             _,image = cv2.threshold(image,180,255,cv2.THRESH_BINARY)
-
+            image = image / 255
             image = np.expand_dims(image,0)
             self.ys.append(image)
+>>>>>>> 352b77782d3a3f8dd736a86a18cb3ec2e093165c
 
         if gpu:
             self.dtype = torch.cuda.FloatTensor
