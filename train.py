@@ -6,6 +6,7 @@ from dataset import Mapdataset
 from models.unet import UNet
 from loss.loss import SSIM
 from tensorboardX import SummaryWriter
+import tools as tools 
 
 # define command line parameter 
 parser = argparse.ArgumentParser(description="Define the parameter of the training process")
@@ -33,7 +34,7 @@ if args.gpu:
 else:
     model = UNet(3,1)
 
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-2)
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
 
 ssim = SSIM(device="cuda:0" if args.gpu else "cpu:0")
 
@@ -45,8 +46,9 @@ for epoch in range(args.epochs):
             loss = -ssim(prediction,train_y)
             loss.backward()
             optimizer.step()
-            if epoch % 2:
-                print("Loss at Epoch",epoch+1,":",loss.item())
+    
+    tools.saveimage(prediction, train_y,epoch)
+    print("Loss at Epoch",epoch,":",loss.item())
         
 
 

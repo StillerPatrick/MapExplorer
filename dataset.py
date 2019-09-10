@@ -29,6 +29,8 @@ class Mapdataset(Dataset):
 
         for file in tqdm((os.listdir(y_path)[:2000]),desc="Load Labels"): 
             image = cv2.imread(os.path.join(y_path,file),0)
+            #cv2.imwrite("gray.png",image)
+            #break
             image = cv2.resize(image,(400,75))
             image = np.expand_dims(image,0)
             #image = np.rollaxis(image,2,0)
