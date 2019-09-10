@@ -6,6 +6,7 @@ from dataset import Mapdataset
 from models.unet import UNet
 from loss.loss import SSIM
 from tensorboardX import SummaryWriter
+import tools as tools 
 import os 
 
 # define command line parameter 
@@ -34,8 +35,8 @@ validationLoader = torch.utils.data.DataLoader(validationDataset,args.batchsize,
 testDataset = Mapdataset(args.basedirtest, args.gpu)
 testLoader = torch.utils.data.DataLoader(testDataset,args.batchsize,args.shuffle)
 
-
 tensorboard_path = os.path.join(args.tbpath,args.identifier)
+
 writer = SummaryWriter(args.tbpath)
 print("Tensorboard enviorment created at:", tensorboard_path)
 
@@ -49,6 +50,7 @@ else:
 
 optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
 
+ssim = SSIM(device="cuda:0" if args.gpu else "cpu:0")
 
 def validationStep(model,loader,epoch):
     validationLoss = []
@@ -66,9 +68,6 @@ def validationStep(model,loader,epoch):
     return np.mean(validationLoss)
 
 
-ssim = SSIM(device='cuda:0')
-mse = torch.nn.MSELoss()
-
 # training loop 
 for epoch in range(args.epochs):
     epoch_loss = []
@@ -79,12 +78,12 @@ for epoch in range(args.epochs):
             loss.backward()
             optimizer.step()
             epoch_loss.append(loss.item())
+        
     if epoch % 30 == 0: 
         eLoss = np.mean(epoch_loss)
         writer.add_scalar('training_loss',loss,epoch)
         val_loss = validationStep(model,validationLoader,epoch)
         print("Training Loss", eLoss, "Validation Loss", val_loss)
-
 
 
 
