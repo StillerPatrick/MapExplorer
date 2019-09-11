@@ -294,7 +294,10 @@ def load_all_words_from_file(input_file):
 def randomWord(dictionary):
     word = random.choice(dictionary)
     
-    result = re.match(r"[a-zA-z\u00c4\u00e4\u00d6\u00f6\u00dc\u00fc\u00df]+", word)
+    while True:
+        result = re.match(r"[a-zA-zÄäÜüÖöß ]+", word)
+        if result is not None:
+            break
     
     return result.group(0)
 
