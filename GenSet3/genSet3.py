@@ -9,6 +9,7 @@ from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 import random
 import os
+import re
 import errno
 from sys import argv, stdout
 import string
@@ -293,15 +294,9 @@ def load_all_words_from_file(input_file):
 def randomWord(dictionary):
     word = random.choice(dictionary)
     
-    word = word.split("\n")[0]
-    word = word.split("-")[0]
-    word = word.split(" ")[0]
-    word = word.split("(")[0]
-    word = word.split("/")[0]
-    word = word.split(".")[0]
-    word = word.split(",")[0]
-
-    return word
+    result = re.match(r"[a-zA-z\u00c4\u00e4\u00d6\u00f6\u00dc\u00fc\u00df]+", word)
+    
+    return result.group(0)
 
 def loadDictFile(file):
 
