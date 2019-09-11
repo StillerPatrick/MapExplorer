@@ -291,11 +291,10 @@ def load_all_words_from_file(input_file):
     
     return lines
 
-def randomWord(dictionary):
-    word = random.choice(dictionary)
-    
+def randomWord(dictionary, pattern):
     while True:
-        result = re.match(r"[a-zA-zÄäÜüÖöß ]+", word)
+        word = random.choice(dictionary)
+        result = pattern.match(word)
         if result is not None:
             break
     
@@ -333,6 +332,8 @@ def spacingTest(word, printIfTooSmall=False):
                 if printIfTooSmall:
                     print("Background " + str(backnr) + " too small for word " + word + " with given offsetX " + str(spacing) + "!")
 
+def getWordPattern():
+    return re.compile("[a-zA-zÄäÜüÖöß ]+")
 
 def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=False, wordList=None):
     # savePath = '../labeled/generated/'
@@ -411,6 +412,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
     maxScale = 3
 
     dictionary = load_all_words_from_file("cities.txt")
+    pattern = getWordPattern()
 
     for back in backgrounds:
         backnr += 1 
@@ -418,7 +420,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            label = randomWord(dictionary)
+            label = randomWord(dictionary, pattern)
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
             #print(fonts[i][1])
