@@ -291,14 +291,30 @@ def load_all_words_from_file(input_file):
     
     return lines
 
-def randomWord(dictionary, pattern):
-    while True:
-        word = random.choice(dictionary)
-        result = pattern.match(word)
-        if result is not None:
-            break
+class WordGenerator():
+    def __init__(self):
+        self.dictionary_iterations = 0
+        self.current_word_counter = 0
+
+    def getRandomWord(self, dictionary, pattern):
+        while True:
+            if((self.current_word_counter) == len(dictionary)):
+                self.dictionary_iterations += 1
+                self.current_word_counter = 0
+
+            word = dictionary[self.current_word_counter]
+            self.current_word_counter += 1
+            result = pattern.match(word)
+            
+            if result is not None:
+                break
+        word = result.group(0) + self.randomString(self.dictionary_iterations)
+        return word
     
-    return result.group(0)
+    def randomString(self, stringLength=10):
+        """Generate a random string of fixed length """
+        letters = string.ascii_lowercase
+        return ''.join(random.choice(letters) for i in range(stringLength))
 
 def loadDictFile(file):
 
@@ -413,6 +429,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
 
     dictionary = load_all_words_from_file("cities.txt")
     pattern = getWordPattern()
+    word_generator = WordGenerator()
 
     for back in backgrounds:
         backnr += 1 
@@ -420,7 +437,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            label = randomWord(dictionary, pattern)
+            label = word_generator.getRandomWord(dictionary, pattern)
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
             #print(fonts[i][1])
