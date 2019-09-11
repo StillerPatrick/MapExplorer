@@ -298,6 +298,8 @@ def randomWord(dictionary):
     word = word.split(" ")[0]
     word = word.split("(")[0]
     word = word.split("/")[0]
+    word = word.split(".")[0]
+    word = word.split(",")[0]
 
     return word
 
@@ -437,7 +439,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
 
             backgroundArea = getRandomBackgroundArea(back, int((size[0] + fontSize // 3) * scale_factor), int((size[1] + fontSize // 3) * scale_factor))
             if(backgroundArea is not None):
-                img = Image.new('RGBA', (backgroundArea.width, backgroundArea.height), (255, 0, 0, 0))
+                img = Image.new('RGBA', (backgroundArea.width, backgroundArea.height), (255, 255, 255, 0))
                 img.paste(font_img, (0, 0), font_img)
                 # dirname should not contain spaces because of parsing-the-annotation-files related things -> replace them!
                 fontDirName = fonts[i][0].replace(' ', '_')
