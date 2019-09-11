@@ -9,8 +9,6 @@ Execute the following commands:
 cd ~/GenSet3
 srun --pty -n 1 -c 4 --time=8:00:00 --mem-per-cpu=1700 bash
 module load Pillow-SIMD/5.0.0-foss-2018a-Python-3.6.4
-pip install --user scikit-learn
 module load matplotlib/2.1.2-foss-2018a-Python-3.6.4
-module load OpenCV
 pip install --user progressbar2
 python genSet3.py 20000 OutputGenerated

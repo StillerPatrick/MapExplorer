@@ -9,14 +9,14 @@ from PIL import Image, ImageFont, ImageDraw
 from collections import defaultdict
 import random
 import os
+import re
 import errno
 from sys import argv, stdout
 import string
 import numpy as np
 
-from sklearn.cluster import KMeans
+import math
 import matplotlib.pyplot as plt
-import cv2
 
 try:
     import progressbar
@@ -291,15 +291,30 @@ def load_all_words_from_file(input_file):
     
     return lines
 
-def randomWord(dictionary):
-    word = random.choice(dictionary)
-    
-    word = word.split("\n")[0]
-    word = word.split("-")[0]
-    word = word.split(" ")[0]
-    word = word.split("(")[0]
+class WordGenerator():
+    def __init__(self):
+        self.dictionary_iterations = 0
+        self.current_word_counter = 0
 
-    return word
+    def getRandomWord(self, dictionary, pattern):
+        while True:
+            if((self.current_word_counter) == len(dictionary)):
+                self.dictionary_iterations += 1
+                self.current_word_counter = 0
+
+            word = dictionary[self.current_word_counter]
+            self.current_word_counter += 1
+            result = pattern.match(word)
+            
+            if result is not None:
+                break
+        word = result.group(0) + self.randomString(self.dictionary_iterations)
+        return word
+    
+    def randomString(self, stringLength=10):
+        """Generate a random string of fixed length """
+        letters = string.ascii_lowercase
+        return ''.join(random.choice(letters) for i in range(stringLength))
 
 def loadDictFile(file):
 
@@ -333,6 +348,8 @@ def spacingTest(word, printIfTooSmall=False):
                 if printIfTooSmall:
                     print("Background " + str(backnr) + " too small for word " + word + " with given offsetX " + str(spacing) + "!")
 
+def getWordPattern():
+    return re.compile("[a-zA-zÄäÜüÖöß ]+")
 
 def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=False, wordList=None):
     # savePath = '../labeled/generated/'
@@ -411,6 +428,8 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
     maxScale = 3
 
     dictionary = load_all_words_from_file("cities.txt")
+    pattern = getWordPattern()
+    word_generator = WordGenerator()
 
     for back in backgrounds:
         backnr += 1 
@@ -418,7 +437,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            label = randomWord(dictionary)
+            label = word_generator.getRandomWord(dictionary, pattern)
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
             #print(fonts[i][1])
@@ -437,12 +456,23 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
 
             backgroundArea = getRandomBackgroundArea(back, int((size[0] + fontSize // 3) * scale_factor), int((size[1] + fontSize // 3) * scale_factor))
             if(backgroundArea is not None):
-                img = Image.new('RGBA', (backgroundArea.width, backgroundArea.height), (255, 0, 0, 0))
+                img = Image.new('RGBA', (backgroundArea.width, backgroundArea.height), (255, 255, 255, 0))
                 img.paste(font_img, (0, 0), font_img)
                 # dirname should not contain spaces because of parsing-the-annotation-files related things -> replace them!
                 fontDirName = fonts[i][0].replace(' ', '_')
 
                 saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathNoBackground, printOutput=False)
+
+                for i in range(1,font_img.width-1):
+                    for j in range(1,font_img.height-1):
+                        (r, g, b, a) = font_img.getpixel((i,j))
+
+                        if(a > 0):
+                            r += (random.randint(-10, 30));
+                            g += (random.randint(-10, 30));
+                            b += (random.randint(-10, 30));
+
+                        font_img.putpixel((i,j), (r, g, b, a))
 
                 # Add background and save it again
                 img.paste(backgroundArea, (0, 0)) # Paste background
@@ -452,15 +482,6 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         bar2.update(backnr * nSamples_per_background_randomFonts)
 
     print("\nDone.")
-
-
-def randomFontColor():
-    # random grey color in specific range
-    R = random.randint(78, 85)
-    G = random.randint(70, 78)
-    B = random.randint(67, 75)
-    # (83, 74, 69) <-- gute Farbe
-    return (R, G, B, 255)
 
 
 def fontTest():
@@ -504,32 +525,7 @@ def plot_colors2(hist, centroids):
 
 
 def getFontColor(back):
-        # from https://code.likeagirl.io/finding-dominant-colour-on-an-image-b4e075f98097
-        # and https://stackoverflow.com/questions/14134892/convert-image-from-pil-to-opencv-format
-
-        colorfindimg = np.array(back.convert('RGB'))
-        colorfindimg = colorfindimg[:, :, ::-1].copy() 
-        colorfindimg = cv2.cvtColor(colorfindimg, cv2.COLOR_BGR2RGB)
-
-        colorfindimg = colorfindimg.reshape((colorfindimg.shape[0] * colorfindimg.shape[1],3)) #represent as row*column,channel number
-        clt = KMeans(n_clusters=KMeans_nClusters) #cluster number
-        clt.fit(colorfindimg)
-
-        hist = find_histogram(clt)
-
-        R_low = 255
-        G_low = 255
-        B_low = 255
-        centers = clt.cluster_centers_
-        n = 0
-        for (percent, color) in zip(hist, clt.cluster_centers_): 
-            # versuchen, den richtigen Farbton zu picken    
-            if(color[0] < R_low): R_low = color[0]
-            if(color[1] < G_low): G_low = color[1]
-            if(color[2] < B_low): B_low = color[2]    
-
-        color = (int(round(R_low)), int(round(G_low)), int(round(B_low)), 255) 
-        return color
+    return (math.floor(120 * random.uniform(0.9, 1.1)), math.floor(110 * random.uniform(0.9, 1.1)), math.floor(100 * random.uniform(0.9, 1.1)), 255)
 
 if __name__ == '__main__':
     # spacingTest("Dykhausen")
