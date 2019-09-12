@@ -21,34 +21,13 @@ class Mapdataset(Dataset):
         self.images_x = [os.path.join(x_path,file) for file in os.listdir(x_path)[:length]]
         self.images_y = [os.path.join(y_path,file) for file in os.listdir(y_path)[:length]]
 
-        #for file in tqdm((os.listdir(x_path)[:length]),desc="Load inputs"):
-        #    try:
-        #        image = cv2.imread(os.path.join(x_path,file),0)
-        #        image = cv2.resize(image,(400,75))
-        #        image = np.expand_dims(image,0)
-        #        image = image /255
-        #        self.xs.append(image)
-        #    except Exception as e: print(e,image)
-        #        
-        #        
-        #for file in tqdm((os.listdir(y_path)[:length]),desc="Load Labels"): 
-        #    try:
-        #        image = cv2.imread(os.path.join(y_path,file),0)
-        #        image = cv2.resize(image,(400,75))
-        #        #_,image = cv2.threshold(image,210,255,cv2.THRESH_BINARY)
-        #        
-        #        image = np.expand_dims(image,0)
-        #        image = image /255
-        #        self.ys.append(image)
-        #    except Exception as e: print(e,image)
-
         if gpu:
             self.dtype = torch.cuda.FloatTensor
         else:
             self.dtype = torch.FloatTensor
 
-    
-    def convert_image(self,filename):
+    @staticmethod
+    def convert_image(filename):
         image = cv2.imread(filename,0)
         image = cv2.resize(image,(400,75))
         image = np.expand_dims(image,0)
