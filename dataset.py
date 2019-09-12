@@ -26,8 +26,7 @@ class Mapdataset(Dataset):
         else:
             self.dtype = torch.FloatTensor
 
-    @staticmethod
-    def convert_image(filename):
+    def convert_image(self, filename):
         image = cv2.imread(filename,0)
         image = cv2.resize(image,(400,75))
         image = np.expand_dims(image,0)
