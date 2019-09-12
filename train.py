@@ -28,10 +28,10 @@ parser.add_argument("--identifier",action="store", type=str)
 
 args = parser.parse_args()
 
-trainDataset = Mapdataset(args.basedirtrain, args.gpu, 30000)
+trainDataset = Mapdataset(args.basedirtrain, args.gpu, 58000)
 trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle)
 
-validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 200)
+validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 1000)
 validationLoader = torch.utils.data.DataLoader(validationDataset,args.batchsize,args.shuffle)
 
 testDataset = Mapdataset(args.basedirtest, args.gpu,1)
@@ -45,12 +45,13 @@ print("Tensorboard enviorment created at:", tensorboard_path)
 
 if args.gpu:
     print("You running your model at gpu")
-    #model = UNet(1,1).cuda()
-    model = FCDenseNet103(1).cuda()
+    model = UNet(1,1).cuda()
 else:
     print("You running your model at cpu")
     model = UNet(1,1)
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
+
+
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-5,weight_decay=0.999)
 
 ssim = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
 
@@ -92,12 +93,13 @@ def save_checkpoint(model, optimizer, path, epoch):
    torch.save(state, path + '_' + str(epoch))
 
 # training loop 
+reg_lambda = 0.05
 for epoch in range(args.epochs):
     epoch_loss = []
     for train_x, train_y in tqdm(trainLoader, desc=f"epoch = {epoch}"):
             optimizer.zero_grad()
-            prediction = model(train_x)
-            loss = ssim(prediction,train_y)
+            prediction = model(train_x)            
+            loss = ssim(prediction,train_y)             
             loss.backward()
             optimizer.step()
 #    tools.saveimage(prediction, train_y,train_x,epoch)
