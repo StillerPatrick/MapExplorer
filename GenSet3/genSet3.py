@@ -231,7 +231,7 @@ def saveLabeledImage(image, label, set, backgroundName, basepath, printOutput=Tr
         print("Saved image to " + filename)
 
 
-def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
+def getRandomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     # erzeugt einen zufälligen String aus den verfügbaren Chars der jeweiligen Liste
     # upperCBehaviour = ['random', 'onlyfirstMAX','onlyfirstMIN', 'allUpper']
     # andere noch nicht implementiert
@@ -239,7 +239,7 @@ def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     if uppercaseBehaviour not in upperCBehaviour:
         raise ValueError("Invalid uppercaseBehaviour. Expected one of: %s" % upperCBehaviour)
 
-    length = minLength + random.randint(0, maxLength - minLength)
+    length = random.randint(minLength, maxLength)
     rndString = ""
 
     # TODO: ACHTUNG! MOMENTAN PROBLEM, WENN NICHT MIND. 1 GROß- UND KLEINBUCHSTABE!
@@ -291,14 +291,30 @@ def load_all_words_from_file(input_file):
     
     return lines
 
-def randomWord(dictionary, pattern):
-    while True:
-        word = random.choice(dictionary)
-        result = pattern.match(word)
-        if result is not None:
-            break
+class WordGenerator():
+    def __init__(self):
+        self.dictionary_iterations = 0
+        self.current_word_counter = 0
+
+    def getRandomWord(self, dictionary, pattern):
+        while True:
+            if((self.current_word_counter) == len(dictionary)):
+                self.dictionary_iterations += 1
+                self.current_word_counter = 0
+
+            word = dictionary[self.current_word_counter]
+            self.current_word_counter += 1
+            result = pattern.match(word)
+            
+            if result is not None:
+                break
+        word = result.group(0) + self.randomString(self.dictionary_iterations)
+        return word
     
-    return result.group(0)
+    def randomString(self, stringLength=10):
+        """Generate a random string of fixed length """
+        letters = string.ascii_lowercase
+        return ''.join(random.choice(letters) for i in range(stringLength))
 
 def loadDictFile(file):
 
@@ -413,6 +429,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
 
     dictionary = load_all_words_from_file("cities.txt")
     pattern = getWordPattern()
+    word_generator = WordGenerator()
 
     for back in backgrounds:
         backnr += 1 
@@ -420,7 +437,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            label = randomWord(dictionary, pattern)
+            label = getRandomString(string.ascii_letters, 2, 15, uppercaseBehaviour='onlyfirstMIN')
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
             #print(fonts[i][1])
@@ -445,17 +462,6 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
                 fontDirName = fonts[i][0].replace(' ', '_')
 
                 saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathNoBackground, printOutput=False)
-
-                for i in range(1,font_img.width-1):
-                    for j in range(1,font_img.height-1):
-                        (r, g, b, a) = font_img.getpixel((i,j))
-
-                        if(a > 0):
-                            r += (random.randint(-10, 30));
-                            g += (random.randint(-10, 30));
-                            b += (random.randint(-10, 30));
-
-                        font_img.putpixel((i,j), (r, g, b, a))
 
                 # Add background and save it again
                 img.paste(backgroundArea, (0, 0)) # Paste background
