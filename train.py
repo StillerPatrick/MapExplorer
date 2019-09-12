@@ -5,7 +5,7 @@ import numpy as np
 from dataset import Mapdataset
 from models.unet import UNet
 from models.tiramisu import FCDenseNet103
-from loss.loss import SSIM
+from loss.loss import dice_loss
 from tensorboardX import SummaryWriter
 import tools as tools 
 from tqdm import tqdm
@@ -28,7 +28,7 @@ parser.add_argument("--identifier",action="store", type=str)
 
 args = parser.parse_args()
 
-trainDataset = Mapdataset(args.basedirtrain, args.gpu, 58000)
+trainDataset = Mapdataset(args.basedirtrain, args.gpu, 20000)
 trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle)
 
 validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 1000)
@@ -51,9 +51,10 @@ else:
     model = UNet(1,1)
 
 
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-5,weight_decay=0.999)
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
 
-ssim = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
+#ssim = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
+loss_function = dice_loss
 
 val_x , val_y = validationLoader.dataset[0]
 writer.add_image("input_image0",val_x,0)
@@ -71,7 +72,7 @@ def validationStep(model,loader,epoch):
     validationLoss = []
     for validation_x, validation_y in loader:
         val_pred = model(validation_x)
-        val_loss = ssim(val_pred,validation_y)
+        val_loss = loss_function(val_pred,validation_y)
         validationLoss.append(val_loss.item())
     writer.add_scalar("validation_loss",np.mean(validationLoss),epoch)
     val_x , _ = loader.dataset[0]
@@ -99,7 +100,7 @@ for epoch in range(args.epochs):
     for train_x, train_y in tqdm(trainLoader, desc=f"epoch = {epoch}"):
             optimizer.zero_grad()
             prediction = model(train_x)            
-            loss = ssim(prediction,train_y)             
+            loss = loss_function(prediction,train_y)             
             loss.backward()
             optimizer.step()
 #    tools.saveimage(prediction, train_y,train_x,epoch)
