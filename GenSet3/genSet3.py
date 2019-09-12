@@ -231,7 +231,7 @@ def saveLabeledImage(image, label, set, backgroundName, basepath, printOutput=Tr
         print("Saved image to " + filename)
 
 
-def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
+def getRandomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     # erzeugt einen zufälligen String aus den verfügbaren Chars der jeweiligen Liste
     # upperCBehaviour = ['random', 'onlyfirstMAX','onlyfirstMIN', 'allUpper']
     # andere noch nicht implementiert
@@ -239,7 +239,7 @@ def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     if uppercaseBehaviour not in upperCBehaviour:
         raise ValueError("Invalid uppercaseBehaviour. Expected one of: %s" % upperCBehaviour)
 
-    length = minLength + random.randint(0, maxLength - minLength)
+    length = random.randint(minLength, maxLength)
     rndString = ""
 
     # TODO: ACHTUNG! MOMENTAN PROBLEM, WENN NICHT MIND. 1 GROß- UND KLEINBUCHSTABE!
@@ -437,7 +437,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            label = word_generator.getRandomWord(dictionary, pattern)
+            label = getRandomString(string.ascii_letters, 2, 15, uppercaseBehaviour='onlyfirstMIN')
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
             #print(fonts[i][1])
