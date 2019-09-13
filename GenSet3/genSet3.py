@@ -231,7 +231,7 @@ def saveLabeledImage(image, label, set, backgroundName, basepath, printOutput=Tr
         print("Saved image to " + filename)
 
 
-def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
+def getRandomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     # erzeugt einen zufälligen String aus den verfügbaren Chars der jeweiligen Liste
     # upperCBehaviour = ['random', 'onlyfirstMAX','onlyfirstMIN', 'allUpper']
     # andere noch nicht implementiert
@@ -239,7 +239,7 @@ def randomString(charList, minLength, maxLength, uppercaseBehaviour='random'):
     if uppercaseBehaviour not in upperCBehaviour:
         raise ValueError("Invalid uppercaseBehaviour. Expected one of: %s" % upperCBehaviour)
 
-    length = minLength + random.randint(0, maxLength - minLength)
+    length = random.randint(minLength, maxLength)
     rndString = ""
 
     # TODO: ACHTUNG! MOMENTAN PROBLEM, WENN NICHT MIND. 1 GROß- UND KLEINBUCHSTABE!
@@ -360,6 +360,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
     savePath = os.path.abspath(dataset_name)
 
     savePathNoBackground=os.path.join(savePath, "NoBackground")
+    savePathNoBackgroundWithArial=os.path.join(savePath, "NoBackgroundWithArial")
     savePathWithBackground=os.path.join(savePath, "WithBackground")
 
     loadBackgroundImages()
@@ -437,10 +438,10 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
         cvFontColor = getFontColor(back) # Berechnen der zweitdominantesten Farbe im Background -> Schriftfarbe
 
         for i in range(nSamples_per_background_randomFonts):
-            label = word_generator.getRandomWord(dictionary, pattern)
+            label = getRandomString(string.ascii_letters, 2, 15, uppercaseBehaviour='onlyfirstMIN')
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
-            #print(fonts[i][1])
+            arial_font = ImageFont.truetype("arial.ttf", fontSize)
             try:
                 font = ImageFont.truetype(fonts[i][1], fontSize)
             except OSError:
@@ -463,21 +464,17 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
 
                 saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathNoBackground, printOutput=False)
 
-                for i in range(1,font_img.width-1):
-                    for j in range(1,font_img.height-1):
-                        (r, g, b, a) = font_img.getpixel((i,j))
-
-                        if(a > 0):
-                            r += (random.randint(-10, 30));
-                            g += (random.randint(-10, 30));
-                            b += (random.randint(-10, 30));
-
-                        font_img.putpixel((i,j), (r, g, b, a))
-
                 # Add background and save it again
                 img.paste(backgroundArea, (0, 0)) # Paste background
                 img.paste(font_img, (0, 0), font_img)
                 saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathWithBackground, printOutput=False)
+
+                font_img = Image.new('RGBA', (size[0], size[1]), (255, 255, 255, 0))
+                ImageDraw.Draw(font_img).text((0, 0), label, font=arial_font, fill=(0, 0, 0, 255))
+                font_img = font_img.resize(newSize)
+                img = Image.new('RGBA', (backgroundArea.width, backgroundArea.height), (255, 255, 255, 0))
+                img.paste(font_img, (0, 0), font_img)
+                saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathNoBackgroundWithArial, printOutput=False)
 
         bar2.update(backnr * nSamples_per_background_randomFonts)
 
