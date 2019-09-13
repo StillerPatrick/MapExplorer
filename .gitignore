@@ -107,4 +107,4 @@ venv.bak/
 dataset/
 runs/
 checkpoints/
-output.png
+out/
