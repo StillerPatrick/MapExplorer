@@ -45,6 +45,18 @@ class Mapdataset(Dataset):
         else:
             self.dtype = torch.FloatTensor
 
+<<<<<<< HEAD
+=======
+    def convert_image(self, filename):
+        image = cv2.imread(filename,0)
+        _,image = cv2.threshold(image,200,255,cv2.THRESH_BINARY)
+        image = cv2.resize(image,(400,75))
+        image = np.expand_dims(image,0)
+        image = image // 255
+        return self.dtype(image)
+
+
+>>>>>>> 7c8bb2ea359cc302c286a199c69734075ea421e0
     def __getitem__(self, index):
         """
         Get a specific item
@@ -59,9 +71,10 @@ class Mapdataset(Dataset):
 
     def get_image(path):
         image = cv2.imread(path,0)
+        _,image = cv2.threshold(image,200,255,cv2.THRESH_BINARY)
         image = cv2.resize(image,(400,75))
         image = np.expand_dims(image,0)
-        image = image / 255
+        image = image // 255
         return torch.Tensor(image)
     
     

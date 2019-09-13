@@ -5,9 +5,14 @@ from torch import optim
 import numpy as np 
 from dataset import Mapdataset
 from models.unet import UNet
+<<<<<<< HEAD
 from models.tiramisu import FCDenseNet57,FCDenseNet103
 from models.fcdensenet import FCDenseNet
 from loss.loss import SSIM
+=======
+from models.tiramisu import FCDenseNet103
+from loss.loss import dice_loss_2
+>>>>>>> 7c8bb2ea359cc302c286a199c69734075ea421e0
 from tensorboardX import SummaryWriter
 import tools as tools 
 from tqdm import tqdm
@@ -30,7 +35,11 @@ parser.add_argument("--identifier",action="store", type=str)
 
 args = parser.parse_args()
 
+<<<<<<< HEAD
 trainDataset = Mapdataset(args.basedirtrain, args.gpu, 30000)
+=======
+trainDataset = Mapdataset(args.basedirtrain, args.gpu, 56000)
+>>>>>>> 7c8bb2ea359cc302c286a199c69734075ea421e0
 trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle)
 
 validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 5000)
@@ -55,7 +64,15 @@ else:
     
 optimizer = torch.optim.Adam(model.parameters(),lr=1e-4)
 
+<<<<<<< HEAD
 loss_func = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
+=======
+
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-4)
+
+#loss_function = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
+loss_function = dice_loss_2
+>>>>>>> 7c8bb2ea359cc302c286a199c69734075ea421e0
 
 val_x , val_y = validationLoader.dataset[0]
 writer.add_image("input_image0",val_x,0)
@@ -73,7 +90,11 @@ def validationStep(model,loader,epoch):
     validationLoss = []
     for validation_x, validation_y in loader:
         val_pred = model(validation_x)
+<<<<<<< HEAD
         val_loss = loss_func(val_pred,validation_y)
+=======
+        val_loss = loss_function(val_pred,validation_y)
+>>>>>>> 7c8bb2ea359cc302c286a199c69734075ea421e0
         validationLoss.append(val_loss.item())
     writer.add_scalar("validation_loss",np.mean(validationLoss),epoch)
     val_x , _ = loader.dataset[0]
@@ -104,8 +125,13 @@ for epoch in range(args.epochs):
     for train_x, train_y in tqdm(trainLoader, desc=f"epoch = {epoch}"):
             scheduler.step()
             optimizer.zero_grad()
+<<<<<<< HEAD
             prediction = model(train_x)
             loss = loss_func(prediction,train_y)
+=======
+            prediction = model(train_x)            
+            loss = loss_function(prediction,train_y)             
+>>>>>>> 7c8bb2ea359cc302c286a199c69734075ea421e0
             loss.backward()
             optimizer.step()
             
