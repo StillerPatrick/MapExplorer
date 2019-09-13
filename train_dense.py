@@ -5,8 +5,7 @@ import numpy as np
 from dataset import Mapdataset
 from models.unet import UNet
 from models.tiramisu import FCDenseNet57, FCDenseNet103
-from loss.loss import SSIM
-from loss.dice_loss import dice_coeff
+from loss.loss import dice_loss
 from tensorboardX import SummaryWriter
 import tools as tools 
 from tqdm import tqdm
@@ -45,8 +44,7 @@ print("Tensorboard enviorment created at:", tensorboard_path)
 
 model = FCDenseNet103(1).cuda()
 optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
-#loss_func = torch.nn.MSELoss()
-loss_func = dice_coeff
+loss_func = dice_loss
 
 val_x , val_y = validationLoader.dataset[0]
 writer.add_image("input_image0",val_x,0)

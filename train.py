@@ -5,7 +5,7 @@ from torch import optim
 import numpy as np 
 from dataset import Mapdataset
 from models.unet import UNet
-from loss.loss import dice_loss_2
+from loss.loss import dice_loss
 from tensorboardX import SummaryWriter
 import tools as tools 
 from tqdm import tqdm
@@ -57,7 +57,7 @@ optimizer = torch.optim.Adam(model.parameters(),lr=1e-4)
 optimizer = torch.optim.Adam(model.parameters(),lr=1e-4)
 
 #loss_function = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
-loss_function = dice_loss_2
+loss_function = dice_loss
 
 val_x , val_y = validationLoader.dataset[0]
 writer.add_image("input_image0",val_x,0)
