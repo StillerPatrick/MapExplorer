@@ -5,7 +5,7 @@ import numpy as np
 from dataset import Mapdataset
 from models.unet import UNet
 from models.tiramisu import FCDenseNet103
-from loss.loss import dice_loss
+from loss.loss import dice_loss_2
 from tensorboardX import SummaryWriter
 import tools as tools 
 from tqdm import tqdm
@@ -28,7 +28,7 @@ parser.add_argument("--identifier",action="store", type=str)
 
 args = parser.parse_args()
 
-trainDataset = Mapdataset(args.basedirtrain, args.gpu, 20000)
+trainDataset = Mapdataset(args.basedirtrain, args.gpu, 56000)
 trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle)
 
 validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 1000)
@@ -51,10 +51,10 @@ else:
     model = UNet(1,1)
 
 
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-4)
 
-#ssim = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
-loss_function = dice_loss
+#loss_function = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
+loss_function = dice_loss_2
 
 val_x , val_y = validationLoader.dataset[0]
 writer.add_image("input_image0",val_x,0)
@@ -94,7 +94,6 @@ def save_checkpoint(model, optimizer, path, epoch):
    torch.save(state, path + '_' + str(epoch))
 
 # training loop 
-reg_lambda = 0.05
 for epoch in range(args.epochs):
     epoch_loss = []
     for train_x, train_y in tqdm(trainLoader, desc=f"epoch = {epoch}"):

@@ -1,2 +1,2 @@
 #!/bin/bash
-python3 train.py --epochs 30 --batchsize 56 --basedirtrain dataset/train58k/ --basedirvalidation dataset/valid6k/ --basedirtest dataset/test3k/ --tbpath runs --gpu 1 --shuffle 1 --identifier data_58k_bin_lr_5
+python3 train.py --epochs 20 --batchsize 32 --basedirtrain dataset/train58k/ --basedirvalidation dataset/valid6k/ --basedirtest dataset/test3k/ --tbpath runs --gpu 1 --shuffle 1 --identifier data_56k_lr4_bin_200th_dice2

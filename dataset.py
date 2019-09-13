@@ -26,13 +26,14 @@ class Mapdataset(Dataset):
         else:
             self.dtype = torch.FloatTensor
 
-    @staticmethod
-    def convert_image(filename):
+    def convert_image(self, filename):
         image = cv2.imread(filename,0)
+        _,image = cv2.threshold(image,200,255,cv2.THRESH_BINARY)
         image = cv2.resize(image,(400,75))
         image = np.expand_dims(image,0)
-        image = image /255
+        image = image // 255
         return self.dtype(image)
+
 
     def __getitem__(self, index):
         """
@@ -51,9 +52,10 @@ class Mapdataset(Dataset):
     @staticmethod
     def get_image(path):
         image = cv2.imread(path,0)
+        _,image = cv2.threshold(image,200,255,cv2.THRESH_BINARY)
         image = cv2.resize(image,(400,75))
         image = np.expand_dims(image,0)
-        image = image / 255
+        image = image // 255
         return torch.Tensor(image)
     
  

@@ -122,3 +122,9 @@ def dice_loss(pred, target):
     B_sum = torch.sum(tflat * tflat)
     
     return 1 - ((2. * intersection + smooth) / (A_sum + B_sum + smooth) )
+
+
+def dice_loss_2(pred,target):
+    numerator = 2 * torch.sum(pred * target)
+    denominator = torch.sum(pred + target)
+    return 1 - (numerator + 1) / (denominator + 1)
