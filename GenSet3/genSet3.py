@@ -360,6 +360,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
     savePath = os.path.abspath(dataset_name)
 
     savePathNoBackground=os.path.join(savePath, "NoBackground")
+    savePathNoBackgroundWithArial=os.path.join(savePath, "NoBackgroundWithArial")
     savePathWithBackground=os.path.join(savePath, "WithBackground")
 
     loadBackgroundImages()
@@ -440,7 +441,7 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
             label = getRandomString(string.ascii_letters, 2, 15, uppercaseBehaviour='onlyfirstMIN')
             fontSize = random.randint(minSize, maxSize)
             i = random.randint(0, len(fonts) - 1)
-            #print(fonts[i][1])
+            arial_font = ImageFont.truetype("arial.ttf", fontSize)
             try:
                 font = ImageFont.truetype(fonts[i][1], fontSize)
             except OSError:
@@ -467,6 +468,13 @@ def generateRandomSamples(nSamples_randomFonts, dataset_name, printIfTooSmall=Fa
                 img.paste(backgroundArea, (0, 0)) # Paste background
                 img.paste(font_img, (0, 0), font_img)
                 saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathWithBackground, printOutput=False)
+
+                font_img = Image.new('RGBA', (size[0], size[1]), (255, 255, 255, 0))
+                ImageDraw.Draw(font_img).text((0, 0), label, font=arial_font, fill=(0, 0, 0, 255))
+                font_img = font_img.resize(newSize)
+                img = Image.new('RGBA', (backgroundArea.width, backgroundArea.height), (255, 255, 255, 0))
+                img.paste(font_img, (0, 0), font_img)
+                saveLabeledImage(img, label, fontDirName, "back_" + str(backnr), savePathNoBackgroundWithArial, printOutput=False)
 
         bar2.update(backnr * nSamples_per_background_randomFonts)
 
