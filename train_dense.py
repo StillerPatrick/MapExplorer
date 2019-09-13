@@ -1,13 +1,12 @@
 import argparse
 import torch 
-from torch import optim
 #import horovod.torch as hvd 
 import numpy as np 
 from dataset import Mapdataset
 from models.unet import UNet
-from models.tiramisu import FCDenseNet57,FCDenseNet103
-from models.fcdensenet import FCDenseNet
+from models.tiramisu import FCDenseNet57, FCDenseNet103
 from loss.loss import SSIM
+from loss.dice_loss import dice_coeff
 from tensorboardX import SummaryWriter
 import tools as tools 
 from tqdm import tqdm
@@ -30,10 +29,10 @@ parser.add_argument("--identifier",action="store", type=str)
 
 args = parser.parse_args()
 
-trainDataset = Mapdataset(args.basedirtrain, args.gpu, 30000)
+trainDataset = Mapdataset(args.basedirtrain, args.gpu, 3000)
 trainLoader = torch.utils.data.DataLoader(trainDataset,args.batchsize,args.shuffle)
 
-validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 5000)
+validationDataset = Mapdataset(args.basedirvalidation, args.gpu, 200)
 validationLoader = torch.utils.data.DataLoader(validationDataset,args.batchsize,args.shuffle)
 
 testDataset = Mapdataset(args.basedirtest, args.gpu,1)
@@ -44,18 +43,10 @@ tensorboard_path = os.path.join(args.tbpath,args.identifier)
 writer = SummaryWriter(tensorboard_path)
 print("Tensorboard enviorment created at:", tensorboard_path)
 
-
-if args.gpu:
-    print("You running your model at gpu")
-    #model = UNet(1,1).cuda()
-    model = FCDenseNet57(1).cuda()
-else:
-    print("You running your model at cpu")
-    model = UNet(1,1)
-    
-optimizer = torch.optim.Adam(model.parameters(),lr=1e-4)
-
-loss_func = torch.nn.MSELoss() # SSIM(device="cuda:0" if args.gpu else "cpu:0")
+model = FCDenseNet103(1).cuda()
+optimizer = torch.optim.Adam(model.parameters(),lr=1e-3)
+#loss_func = torch.nn.MSELoss()
+loss_func = dice_coeff
 
 val_x , val_y = validationLoader.dataset[0]
 writer.add_image("input_image0",val_x,0)
@@ -94,24 +85,15 @@ def save_checkpoint(model, optimizer, path, epoch):
    }
    torch.save(state, path + '_' + str(epoch))
 
-
-steps = len(trainLoader)
-scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, steps)
-    
 # training loop 
 for epoch in range(args.epochs):
     epoch_loss = []
     for train_x, train_y in tqdm(trainLoader, desc=f"epoch = {epoch}"):
-            scheduler.step()
             optimizer.zero_grad()
             prediction = model(train_x)
             loss = loss_func(prediction,train_y)
             loss.backward()
             optimizer.step()
-            
-    scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, steps)
-            #    tools.saveimage(prediction, train_y,train_x,epoch)
-#    print("Loss at Epoch",epoch,":",loss.item())
     epoch_loss.append(loss.item())
         
     if epoch % 1 == 0: 
